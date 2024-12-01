@@ -18,4 +18,13 @@
     <string name="set_profile_photo">Set profile photo</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
+    <string name="new_video">New video</string>
+    <string name="tag">Tag</string>
+    <string name="description">Description</string>
+    <string name="password_is_too_small">Password is too small</string>
+    <string name="choose_profile_photo">Choose profile photo</string>
+    <string name="Gallery">Gallery</string>
+    <string name="empty_field">Empty field</string>
+    <string name="fill_all_fields_and_upload_a_video">Fill all fields and upload a video</string>
+    <string name="select_video_source">Select Video Source</string>
 </resources>

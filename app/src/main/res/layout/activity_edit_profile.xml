@@ -23,7 +23,7 @@
         android:text="@string/edit_profile"
         android:textColor="@color/white"
         android:textSize="32sp"
-        app:layout_constraintBottom_toTopOf="@+id/check_mark"
+        app:layout_constraintBottom_toTopOf="@+id/done_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_guideline" />
@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@id/top_guideline" />
 
     <ImageButton
-        android:id="@+id/check_mark"
+        android:id="@+id/done_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
@@ -59,7 +59,7 @@
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/check_mark"
+        app:layout_constraintTop_toBottomOf="@id/done_button"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.MaterialComponents.Circle" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -159,6 +159,7 @@
         android:layout_marginStart="60dp"
         android:layout_marginEnd="60dp"
         app:errorEnabled="true"
+        app:endIconMode="password_toggle"
         app:errorIconDrawable="@drawable/ic_error"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

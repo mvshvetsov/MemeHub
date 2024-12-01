@@ -7,15 +7,19 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
+import ru.shvetsov.memehub.R
 import ru.shvetsov.memehub.data.requests.RegisterRequest
 import ru.shvetsov.memehub.databinding.ActivityRegistrationBinding
-import ru.shvetsov.memehub.presentation.viewmodels.MainViewModel
+import ru.shvetsov.memehub.presentation.viewmodels.UserViewModel
+import ru.shvetsov.memehub.utils.constants.Constants.SUCCESS
+import ru.shvetsov.memehub.utils.constants.Constants.USERNAME_IS_ALREADY_TAKEN
+import ru.shvetsov.memehub.utils.constants.Constants.USER_WITH_LOGIN_ALREADY_EXIST
 
 @AndroidEntryPoint
 class RegistrationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegistrationBinding
-    private val mainViewModel: MainViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
     private val loginIntent by lazy { Intent(this@RegistrationActivity, LoginActivity::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,37 +53,37 @@ class RegistrationActivity : AppCompatActivity() {
             var hasError = false
 
             if (login.isBlank()) {
-                binding.loginInputLayout.error = "Empty field"
+                binding.loginInputLayout.error = getString(R.string.empty_field)
                 hasError = true
             }
 
             if (username.isBlank()) {
-                binding.usernameInputLayout.error = "Empty field"
+                binding.usernameInputLayout.error = getString(R.string.empty_field)
                 hasError = true
             }
 
             if (password.isBlank()) {
-                binding.passwordInputLayout.error = "Empty field"
+                binding.passwordInputLayout.error = getString(R.string.empty_field)
                 hasError = true
             } else if (password.length < 8) {
-                binding.passwordInputLayout.error = "Password is too small"
+                binding.passwordInputLayout.error = getString(R.string.password_is_too_small)
                 hasError = true
             }
 
             if (!hasError) {
-                mainViewModel.register(registerRequest)
+                userViewModel.register(registerRequest)
             }
         }
 
-        mainViewModel.registrationResult.observe(this) { message ->
+        userViewModel.registrationResult.observe(this) { message ->
             when {
-                message.contains("login") -> {
+                message.contains(USER_WITH_LOGIN_ALREADY_EXIST) -> {
                     binding.loginInputLayout.error = message
                 }
-                message.contains("Username") -> {
+                message.contains(USERNAME_IS_ALREADY_TAKEN) -> {
                     binding.usernameInputLayout.error = message
                 }
-                message.contains("Success") -> {
+                message.contains(SUCCESS) -> {
                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                     loginIntent.flags =
                         Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP

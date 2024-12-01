@@ -2,13 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.devtools.ksp)
-    alias(libs.plugins.jetbrains.kotlin.plugin.serialization)
     alias(libs.plugins.google.dagger.hilt.android)
 }
 
 android {
     namespace = "ru.shvetsov.memehub"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ru.shvetsov.memehub"
@@ -51,9 +50,7 @@ dependencies {
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.fragment)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.media3.ui)
     //retrofit
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.gson)
@@ -64,12 +61,12 @@ dependencies {
     //hilt
     implementation(libs.dagger.hilt.android)
     ksp(libs.dagger.hilt.compiler)
-    //serialization
-    implementation(libs.kotlinx.serialization)
     //glide
     implementation(libs.glide)
     //lottie
     implementation(libs.lottie)
-    //compressor
+    //compressor (photo)
     implementation(libs.id.zelory.compressor)
+    //exoPlayer
+    implementation(libs.androidx.media3.exoplayer)
 }

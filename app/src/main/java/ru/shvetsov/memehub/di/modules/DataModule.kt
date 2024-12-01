@@ -10,7 +10,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.repositories.UserRepositoryImpl
+import ru.shvetsov.memehub.data.repositories.VideoRepositoryImpl
 import ru.shvetsov.memehub.domain.repositories.UserRepository
+import ru.shvetsov.memehub.domain.repositories.VideoRepository
 import javax.inject.Singleton
 
 @Module
@@ -33,5 +35,11 @@ class DataModule {
     @Singleton
     fun provideTokenStorage(sharedPreferences: SharedPreferences): TokenStorage {
         return TokenStorage(sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVideoRepository(tokenStorage: TokenStorage): VideoRepository {
+        return VideoRepositoryImpl(tokenStorage)
     }
 }

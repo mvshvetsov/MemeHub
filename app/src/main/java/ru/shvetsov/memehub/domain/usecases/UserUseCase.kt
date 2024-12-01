@@ -3,6 +3,7 @@ package ru.shvetsov.memehub.domain.usecases
 import retrofit2.Response
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
+import ru.shvetsov.memehub.data.requests.UpdateRequest
 import ru.shvetsov.memehub.data.response.BaseResponse
 import ru.shvetsov.memehub.data.response.LoginResponse
 import ru.shvetsov.memehub.data.response.UserResponse
@@ -27,5 +28,9 @@ class UserUseCase(
 
     suspend fun uploadProfileImage(imageFile: File): Response<UserResponse> {
         return userRepository.uploadProfileImage(imageFile)
+    }
+
+    suspend fun updateUserProfile(userId: Int, updateRequest: UpdateRequest): Response<BaseResponse> {
+        return userRepository.updateUserProfile(userId, updateRequest)
     }
 }

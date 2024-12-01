@@ -1,7 +1,6 @@
 package ru.shvetsov.memehub.presentation.viewmodels
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,14 +12,18 @@ import kotlinx.coroutines.launch
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
+import ru.shvetsov.memehub.data.requests.UpdateRequest
 import ru.shvetsov.memehub.data.response.BaseResponse
 import ru.shvetsov.memehub.data.response.UserResponse
 import ru.shvetsov.memehub.domain.usecases.UserUseCase
+import ru.shvetsov.memehub.utils.constants.Constants.FAILED_TO_UPLOAD_PROFILE_IMAGE
+import ru.shvetsov.memehub.utils.constants.Constants.SOMETHING_WENT_WRONG
+import ru.shvetsov.memehub.utils.constants.Constants.SUCCESS
 import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class UserViewModel @Inject constructor(
     private val userUseCase: UserUseCase,
     private val tokenStorage: TokenStorage,
     private val sharedPreferences: SharedPreferences
@@ -38,6 +41,9 @@ class MainViewModel @Inject constructor(
     private val _userProfile = MutableLiveData<UserResponse>()
     val userProfile: LiveData<UserResponse> get() = _userProfile
 
+    private val _updateProfileResult = MutableLiveData<String>()
+    val updateProfileResult: LiveData<String> get() = _updateProfileResult
+
     fun register(registerRequest: RegisterRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -50,7 +56,7 @@ class MainViewModel @Inject constructor(
                     _registrationResult.postValue(errorResponse.message)
                 }
             } catch (e: Exception) {
-                _registrationResult.postValue("Something went wrong")
+                _registrationResult.postValue(SOMETHING_WENT_WRONG)
             }
         }
     }
@@ -62,14 +68,14 @@ class MainViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     tokenStorage.saveToken(response.body()?.token.toString())
                     tokenStorage.saveUserId(response.body()?.id!!.toInt())
-                    _loginResult.postValue("Success")
+                    _loginResult.postValue(SUCCESS)
                 } else {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = Gson().fromJson(errorBody, BaseResponse::class.java)
                     _loginResult.postValue(errorResponse.message)
                 }
             } catch (e: Exception) {
-                _loginResult.postValue("Something went wrong ${e.message}")
+                _loginResult.postValue(SOMETHING_WENT_WRONG + e.message)
             }
         }
     }
@@ -88,15 +94,30 @@ class MainViewModel @Inject constructor(
                 if (response.isSuccessful && response.body() != null) {
                     getUserProfile(tokenStorage.getUserId())
                 } else {
-                    _loginResult.postValue("Failed to upload profile image")
+                    _loginResult.postValue(FAILED_TO_UPLOAD_PROFILE_IMAGE)
                 }
             } catch (e: Exception) {
-                _loginResult.postValue("Failed to upload profile image")
+                _loginResult.postValue(FAILED_TO_UPLOAD_PROFILE_IMAGE)
             }
         }
     }
 
-
+    fun updateUserProfile(userId: Int, updateRequest: UpdateRequest) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = userUseCase.updateUserProfile(userId, updateRequest)
+                if (response.isSuccessful) {
+                    _updateProfileResult.postValue(response.body()?.message)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = Gson().fromJson(errorBody, BaseResponse::class.java)
+                    _updateProfileResult.postValue(errorResponse.message)
+                }
+            } catch (e: Exception) {
+                _updateProfileResult.postValue(SOMETHING_WENT_WRONG)
+            }
+        }
+    }
 
     fun logout() {
         sharedPreferences.edit().clear().apply()

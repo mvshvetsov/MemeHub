@@ -4,6 +4,7 @@ import android.net.Uri
 import retrofit2.Response
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
+import ru.shvetsov.memehub.data.requests.UpdateRequest
 import ru.shvetsov.memehub.data.response.BaseResponse
 import ru.shvetsov.memehub.data.response.LoginResponse
 import ru.shvetsov.memehub.data.response.UserResponse
@@ -18,4 +19,6 @@ interface UserRepository {
     suspend fun getUserProfile(userId: Int): Response<UserResponse>
 
     suspend fun uploadProfileImage(imageFile: File): Response<UserResponse>
+
+    suspend fun updateUserProfile(userId: Int, updateRequest: UpdateRequest): Response<BaseResponse>
 }

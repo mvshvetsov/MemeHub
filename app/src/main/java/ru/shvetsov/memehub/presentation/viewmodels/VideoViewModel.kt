@@ -19,13 +19,19 @@ class VideoViewModel @Inject constructor(
     private val videoUseCase: VideoUseCase
 ): ViewModel() {
 
+    private var thumbnailFile: File? = null
+
+    fun setThumbnailFile(file: File) {
+        thumbnailFile = file
+    }
+
     private val _uploadVideoResult = MutableLiveData<String>()
     val uploadVideoResult: LiveData<String> get() = _uploadVideoResult
 
     fun uploadVideo(uploadVideoRequest: UploadVideoRequest, videoFile: File) {
         viewModelScope.launch {
             try {
-                val response = videoUseCase.uploadVideo(uploadVideoRequest, videoFile)
+                val response = videoUseCase.uploadVideo(uploadVideoRequest, videoFile, thumbnailFile!!)
                 if (response.isSuccessful) {
                     _uploadVideoResult.postValue(VIDEO_UPLOAD_SUCCESSFULLY)
                 } else {

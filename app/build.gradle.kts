@@ -63,6 +63,7 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     //glide
     implementation(libs.glide)
+    ksp(libs.glide.compiler)
     //lottie
     implementation(libs.lottie)
     //compressor (photo)

@@ -3,6 +3,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import ru.shvetsov.memehub.data.models.VideoModel
 import ru.shvetsov.memehub.data.network.RetrofitInstance.Companion.apiService
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.LoginRequest
@@ -51,5 +52,10 @@ class UserRepositoryImpl @Inject constructor(
         val token = tokenStorage.getToken()
         val response = apiService.updateUserProfile("Bearer $token", userId, updateRequest)
         return response
+    }
+
+    override suspend fun getVideosByUserId(userId: Int): Response<List<VideoModel>> {
+        val token = tokenStorage.getToken()
+        return apiService.getVideosByUserId("Bearer $token", userId)
     }
 }

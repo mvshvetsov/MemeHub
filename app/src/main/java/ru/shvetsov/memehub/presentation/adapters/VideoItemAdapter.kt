@@ -3,11 +3,11 @@ package ru.shvetsov.memehub.presentation.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import ru.shvetsov.memehub.data.models.VideoItem
+import ru.shvetsov.memehub.data.models.VideoModel
 import ru.shvetsov.memehub.databinding.VideoItemBinding
 
 class VideoItemAdapter(
-    private val videoList: List<VideoItem>
+    private val videoList: List<VideoModel>
 ) : RecyclerView.Adapter<VideoItemAdapter.ViewHolder>() {
 
     class ViewHolder(private val binding: VideoItemBinding) : RecyclerView.ViewHolder(binding.root)

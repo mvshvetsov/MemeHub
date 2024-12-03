@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.shvetsov.memehub.data.models.VideoModel
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
@@ -43,6 +44,9 @@ class UserViewModel @Inject constructor(
 
     private val _updateProfileResult = MutableLiveData<String>()
     val updateProfileResult: LiveData<String> get() = _updateProfileResult
+
+    private val _userVideos = MutableLiveData<List<VideoModel>>()
+    val userVideos: LiveData<List<VideoModel>> get() = _userVideos
 
     fun register(registerRequest: RegisterRequest) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -115,6 +119,21 @@ class UserViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _updateProfileResult.postValue(SOMETHING_WENT_WRONG)
+            }
+        }
+    }
+
+    fun getVideosByUserId(userId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = userUseCase.getVideosByUserId(userId)
+                if (response.isSuccessful) {
+                    _userVideos.postValue(response.body())
+                } else {
+                    _userVideos.postValue(emptyList())
+                }
+            } catch (e: Exception) {
+                _userVideos.postValue(emptyList())
             }
         }
     }

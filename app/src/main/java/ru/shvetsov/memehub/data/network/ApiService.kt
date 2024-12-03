@@ -10,6 +10,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Query
+import ru.shvetsov.memehub.data.models.VideoModel
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
 import ru.shvetsov.memehub.data.requests.UpdateRequest
@@ -49,6 +50,13 @@ interface ApiService {
     suspend fun uploadVideo(
         @Header("Authorization") token: String,
         @Part videoRequest: MultipartBody.Part,
-        @Part video: MultipartBody.Part
+        @Part video: MultipartBody.Part,
+        @Part thumbnail: MultipartBody.Part
     ): Response<BaseResponse>
+
+    @GET("/user/videos")
+    suspend fun getVideosByUserId(
+        @Header("Authorization") token: String,
+        @Query("user_id") userId: Int
+    ): Response<List<VideoModel>>
 }

@@ -1,6 +1,5 @@
 package ru.shvetsov.memehub.data.repositories
 
-import android.util.Log
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -16,19 +15,28 @@ import java.io.File
 import javax.inject.Inject
 
 class VideoRepositoryImpl @Inject constructor(
-    private val tokenStorage: TokenStorage
+    tokenStorage: TokenStorage
 ) : VideoRepository {
+    val token = tokenStorage.getToken()
+    val userId = tokenStorage.getUserId()
+
     override suspend fun uploadVideo(
         uploadVideoRequest: UploadVideoRequest,
-        videoFile: File
+        videoFile: File,
+        thumbnailFile: File
     ): Response<BaseResponse> {
         val gson = Gson()
-        val token = tokenStorage.getToken()
         val videoRequestJson = gson.toJson(uploadVideoRequest)
         val videoRequestBody = videoRequestJson.toRequestBody("application/json".toMediaTypeOrNull())
         val videoRequestPart = MultipartBody.Part.createFormData("videoRequest", null, videoRequestBody)
+
         val videoFileRequestBody = videoFile.asRequestBody("video/mp4".toMediaTypeOrNull())
         val videoPart = MultipartBody.Part.createFormData("video", videoFile.name, videoFileRequestBody)
-        return apiService.uploadVideo("Bearer $token", videoRequestPart, videoPart)
+
+        val thumbnailPart = thumbnailFile.let {
+            val thumbnailRequestBody = it.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("thumbnail", it.name, thumbnailRequestBody)
+        }
+        return apiService.uploadVideo("Bearer $token", videoRequestPart, videoPart, thumbnailPart)
     }
 }

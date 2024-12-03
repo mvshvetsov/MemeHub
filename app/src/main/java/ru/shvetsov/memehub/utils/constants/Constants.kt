@@ -1,7 +1,7 @@
 package ru.shvetsov.memehub.utils.constants
 
 object Constants {
-    const val BASE_URL = "http://192.168.0.14:8080"
+    const val BASE_URL = "http://192.168.1.50:8080"
     const val FAILED_TO_UPDATE_USER_INFORMATION = "Failed to update user information"
     const val USER_WITH_LOGIN_ALREADY_EXIST = "User with login already exist"
     const val USERNAME_IS_ALREADY_TAKEN = "Username is already taken"

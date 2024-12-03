@@ -1,5 +1,6 @@
 package ru.shvetsov.memehub.presentation.fragments
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,9 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.shvetsov.memehub.R
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.UploadVideoRequest
@@ -22,6 +28,7 @@ import ru.shvetsov.memehub.databinding.FragmentUploadVideoBinding
 import ru.shvetsov.memehub.presentation.viewmodels.VideoViewModel
 import ru.shvetsov.memehub.utils.constants.Constants.VIDEO_UPLOAD_SUCCESSFULLY
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -137,9 +144,20 @@ class UploadVideoFragment : Fragment() {
 
     private fun handleVideoUri(uri: Uri) {
         currentVideoUri = uri
-
         videoFile = createFileFromUri(uri)
-        setupVideoPreviewWithExoPlayer(uri)
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val thumbnailFile = generateThumbnailFromVideo(uri)
+                videoViewModel.setThumbnailFile(thumbnailFile)
+                setupVideoPreviewWithExoPlayer(uri)
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to generate thumbnail",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun createFileFromUri(uri: Uri): File {
@@ -182,6 +200,20 @@ class UploadVideoFragment : Fragment() {
     private fun releaseExoPlayer() {
         exoPlayer?.release()
         exoPlayer = null
+    }
+
+    private suspend fun generateThumbnailFromVideo(videoUri: Uri): File = withContext(Dispatchers.IO) {
+        val bitmap = Glide.with(requireContext())
+            .asBitmap()
+            .load(videoUri)
+            .submit()
+            .get()
+
+        val thumbnailFile = File(requireContext().cacheDir, "thumbnail.jpg")
+        FileOutputStream(thumbnailFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+        }
+        thumbnailFile
     }
 
     override fun onDestroyView() {

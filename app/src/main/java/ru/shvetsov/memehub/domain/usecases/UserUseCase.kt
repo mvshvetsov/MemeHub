@@ -1,6 +1,7 @@
 package ru.shvetsov.memehub.domain.usecases
 
 import retrofit2.Response
+import ru.shvetsov.memehub.data.models.VideoModel
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
 import ru.shvetsov.memehub.data.requests.UpdateRequest
@@ -32,5 +33,9 @@ class UserUseCase(
 
     suspend fun updateUserProfile(userId: Int, updateRequest: UpdateRequest): Response<BaseResponse> {
         return userRepository.updateUserProfile(userId, updateRequest)
+    }
+
+    suspend fun getVideosByUserId(userId: Int): Response<List<VideoModel>> {
+        return userRepository.getVideosByUserId(userId)
     }
 }

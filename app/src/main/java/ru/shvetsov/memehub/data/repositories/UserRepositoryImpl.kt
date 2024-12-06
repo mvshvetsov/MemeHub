@@ -1,9 +1,10 @@
 package ru.shvetsov.memehub.data.repositories
+
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import ru.shvetsov.memehub.data.models.VideoModel
+import ru.shvetsov.memehub.data.models.VideoWithUserInfoModel
 import ru.shvetsov.memehub.data.network.RetrofitInstance.Companion.apiService
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.LoginRequest
@@ -17,8 +18,10 @@ import java.io.File
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val tokenStorage: TokenStorage
+    tokenStorage: TokenStorage
 ) : UserRepository {
+
+    private val token = tokenStorage.getToken()
 
     override suspend fun registerUser(registerRequest: RegisterRequest): Response<BaseResponse?> {
         return try {
@@ -35,13 +38,11 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserProfile(userId: Int): Response<UserResponse> {
-        val token = tokenStorage.getToken()
         val response = apiService.getUserProfile("Bearer $token", userId)
         return response
     }
 
     override suspend fun uploadProfileImage(imageFile: File): Response<UserResponse> {
-        val token = tokenStorage.getToken()
         val requestFile = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
 
@@ -49,13 +50,15 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUserProfile(userId: Int, updateRequest: UpdateRequest): Response<BaseResponse> {
-        val token = tokenStorage.getToken()
         val response = apiService.updateUserProfile("Bearer $token", userId, updateRequest)
         return response
     }
 
-    override suspend fun getVideosByUserId(userId: Int): Response<List<VideoModel>> {
-        val token = tokenStorage.getToken()
+    override suspend fun getVideosByUserId(userId: Int): Response<List<VideoWithUserInfoModel>> {
         return apiService.getVideosByUserId("Bearer $token", userId)
+    }
+
+    override suspend fun getVideos(): Response<List<VideoWithUserInfoModel>> {
+        return apiService.getVideos("Bearer $token")
     }
 }

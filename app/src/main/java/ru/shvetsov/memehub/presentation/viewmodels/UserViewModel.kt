@@ -1,6 +1,7 @@
 package ru.shvetsov.memehub.presentation.viewmodels
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.shvetsov.memehub.data.models.VideoModel
+import ru.shvetsov.memehub.data.models.VideoWithUserInfoModel
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
@@ -45,8 +47,11 @@ class UserViewModel @Inject constructor(
     private val _updateProfileResult = MutableLiveData<String>()
     val updateProfileResult: LiveData<String> get() = _updateProfileResult
 
-    private val _userVideos = MutableLiveData<List<VideoModel>>()
-    val userVideos: LiveData<List<VideoModel>> get() = _userVideos
+    private val _userVideos = MutableLiveData<List<VideoWithUserInfoModel>>()
+    val userVideos: LiveData<List<VideoWithUserInfoModel>> get() = _userVideos
+
+    private val _videos = MutableLiveData<List<VideoWithUserInfoModel>>()
+    val videos: LiveData<List<VideoWithUserInfoModel>> get() = _videos
 
     fun register(registerRequest: RegisterRequest) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -130,10 +135,27 @@ class UserViewModel @Inject constructor(
                 if (response.isSuccessful) {
                     _userVideos.postValue(response.body())
                 } else {
+                    Log.e("ProfileFragment", "Failed to load user videos: ${response.errorBody()?.string()}")
                     _userVideos.postValue(emptyList())
                 }
             } catch (e: Exception) {
+                Log.e("ProfileFragment", "Error loading user videos: ${e.message}")
                 _userVideos.postValue(emptyList())
+            }
+        }
+    }
+
+    fun getVideos() {
+        viewModelScope.launch {
+            try {
+                val response = userUseCase.getVideos()
+                if (response.isSuccessful) {
+                    _videos.postValue(response.body())
+                } else {
+                    _videos.postValue(emptyList())
+                }
+            } catch (e: Exception) {
+                _videos.postValue(emptyList())
             }
         }
     }

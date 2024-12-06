@@ -1,7 +1,7 @@
 package ru.shvetsov.memehub.domain.repositories
 
 import retrofit2.Response
-import ru.shvetsov.memehub.data.models.VideoModel
+import ru.shvetsov.memehub.data.models.VideoWithUserInfoModel
 import ru.shvetsov.memehub.data.requests.LoginRequest
 import ru.shvetsov.memehub.data.requests.RegisterRequest
 import ru.shvetsov.memehub.data.requests.UpdateRequest
@@ -22,5 +22,7 @@ interface UserRepository {
 
     suspend fun updateUserProfile(userId: Int, updateRequest: UpdateRequest): Response<BaseResponse>
 
-    suspend fun getVideosByUserId(userId: Int): Response<List<VideoModel>>
+    suspend fun getVideosByUserId(userId: Int): Response<List<VideoWithUserInfoModel>>
+
+    suspend fun getVideos(): Response<List<VideoWithUserInfoModel>>
 }

@@ -2,14 +2,17 @@ package ru.shvetsov.memehub.presentation.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import ru.shvetsov.memehub.R
 import ru.shvetsov.memehub.data.network.token.TokenStorage
 import ru.shvetsov.memehub.databinding.FragmentProfileBinding
 import ru.shvetsov.memehub.presentation.activities.EditProfileActivity
@@ -47,11 +50,20 @@ class ProfileFragment : Fragment() {
 
         binding.loading.visibility = View.VISIBLE
 
-        adapter = ProfileVideoAdapter(mutableListOf())
+        adapter = ProfileVideoAdapter(mutableListOf()) { clickedVideoIndex ->
+            val videoList = viewModel.userVideos.value ?: return@ProfileVideoAdapter
+            videoList[clickedVideoIndex]
+            val fragment = VideoPlayerFragment.newInstance(videoList, clickedVideoIndex)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_holder, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
 
         binding.videosRecyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 3)
-            addItemDecoration(GridSpacingItemDecoration(3, 16))
+            val orangeColor = ContextCompat.getColor(requireContext(), R.color.orange)
+            addItemDecoration(GridSpacingItemDecoration(3, orangeColor))
             adapter = this@ProfileFragment.adapter
         }
 
@@ -67,7 +79,11 @@ class ProfileFragment : Fragment() {
         }
 
         viewModel.userVideos.observe(viewLifecycleOwner) { videos ->
-            adapter.updateData(videos)
+            if (videos.isEmpty()) {
+                Log.e("ProfileFragment", "No videos found for user with id: $userId")
+            } else {
+                adapter.updateData(videos)
+            }
         }
 
         viewModel.logoutEvent.observe(viewLifecycleOwner) { isLoggedOut ->
